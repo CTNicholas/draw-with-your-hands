@@ -2,30 +2,43 @@ import { createSignal, onMount, Show } from "solid-js";
 import { FilesetResolver, GestureRecognizer } from "@mediapipe/tasks-vision";
 import styles from "./Webcam.module.css";
 
-export default function Webcam() {
+type Props = {
+  onReady: (video: HTMLVideoElement) => void;
+};
+
+export default function Webcam(props: Props) {
   let video!: HTMLVideoElement;
-  const [webcamRunning, setWebcamRunning] = createSignal(false);
+  const [webcamRunning, setWebcamRunning] = createSignal(true);
   const [error, setError] = createSignal(false);
 
   onMount(() => {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setWebcamRunning(false);
       setError(true);
       return;
+    }
+
+    try {
+      enableWebcam();
+    } catch (err) {
+      setWebcamRunning(false);
     }
   });
 
   function enableWebcam() {
-    const constraints = {
-      video: true,
-    };
-
-    // Activate the webcam stream.
-    navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
-      video.srcObject = stream;
-      video.play();
-      setWebcamRunning(true);
-      // video.addEventListener("loadeddata", predictWebcam);
-    });
+    navigator.mediaDevices
+      .getUserMedia({ video: true })
+      .then(function (stream) {
+        const aspectRatio =
+          stream.getVideoTracks()[0].getSettings().aspectRatio || 16 / 9;
+        const width = 480;
+        video.style.width = `${width}px`;
+        video.style.height = `${(1 / aspectRatio) * width}px`;
+        video.srcObject = stream;
+        video.play();
+        setWebcamRunning(true);
+        video.addEventListener("loadeddata", () => props.onReady(video));
+      });
   }
 
   return (

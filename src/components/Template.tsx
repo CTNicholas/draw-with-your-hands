@@ -5,11 +5,11 @@ type Props = {
   children: JSXElement;
 };
 
-export default function Template({ children }: Props) {
+export default function Template(props: Props) {
   return (
     <main class={styles.main}>
       <Logo />
-      {children}
+      {props.children}
     </main>
   );
 }

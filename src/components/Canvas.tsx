@@ -11,13 +11,15 @@ type Props = {
   strokes: Storage["strokes"];
 };
 
-export default function Canvas({ room, strokes }: Props) {
+export default function Canvas(props: Props) {
   const [currentStroke, setCurrentStroke] = createSignal("");
-  const [strokeIds, setStrokeIds] = createSignal<string[]>([...strokes.keys()]);
+  const [strokeIds, setStrokeIds] = createSignal<string[]>([
+    ...props.strokes.keys(),
+  ]);
 
   function startStroke([x, y, pressure]: Point) {
     const id = randomId();
-    strokes.set(
+    props.strokes.set(
       id,
       new LiveObject({
         gradient: 3,
@@ -28,7 +30,7 @@ export default function Canvas({ room, strokes }: Props) {
   }
 
   function continueStroke([x, y, pressure]: Point) {
-    strokes
+    props.strokes
       ?.get(currentStroke())
       ?.get("points")
       .push([x, y, pressure || 0.5]);
@@ -48,8 +50,8 @@ export default function Canvas({ room, strokes }: Props) {
   }
 
   onMount(() => {
-    const unsubscribe = room.subscribe(
-      strokes,
+    const unsubscribe = props.room.subscribe(
+      props.strokes,
       (newStrokes: Storage["strokes"]) => {
         setStrokeIds([...newStrokes.keys()]);
       }
@@ -73,8 +75,10 @@ export default function Canvas({ room, strokes }: Props) {
         </defs>
         <For each={[...strokeIds()]}>
           {(id) => {
-            const stroke = strokes.get(id);
-            return stroke ? <StrokePath room={room} stroke={stroke} /> : null;
+            const stroke = props.strokes.get(id);
+            return stroke ? (
+              <StrokePath room={props.room} stroke={stroke} />
+            ) : null;
           }}
         </For>
       </svg>

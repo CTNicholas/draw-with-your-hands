@@ -4,21 +4,18 @@ import styles from "~/components/Canvas.module.css";
 import { getSvgPathFromStroke } from "~/components/utils/getSvgPathFromStroke";
 import getStroke from "perfect-freehand";
 
-export default function StrokePath({
-  stroke,
-  room,
-}: {
-  stroke: Stroke;
-  room: Room;
-}) {
+export default function StrokePath(props: { stroke: Stroke; room: Room }) {
   const [pathData, setPathData] = createSignal<string>(
-    createPathData([...stroke.get("points").toImmutable()])
+    createPathData([...props.stroke.get("points").toImmutable()])
   );
 
   onMount(() => {
-    const unsubscribe = room.subscribe(stroke.get("points"), (newPoints) => {
-      setPathData(createPathData([...newPoints.toImmutable()]));
-    });
+    const unsubscribe = props.room.subscribe(
+      props.stroke.get("points"),
+      (newPoints) => {
+        setPathData(createPathData([...newPoints.toImmutable()]));
+      }
+    );
 
     onCleanup(unsubscribe);
   });

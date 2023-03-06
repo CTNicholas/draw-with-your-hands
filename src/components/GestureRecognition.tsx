@@ -1,15 +1,38 @@
-import { onMount } from "solid-js";
+import { createSignal, onMount } from "solid-js";
 import { FilesetResolver, GestureRecognizer } from "@mediapipe/tasks-vision";
 import Webcam from "~/components/Webcam";
 import styles from "./GestureRecognition.module.css";
 
 export default function GestureRecognition() {
+  const [gestureRecognizer, setGestureRecognizer] =
+    createSignal<GestureRecognizer>();
+  const [gesture, setGesture] = createSignal("NONE");
+
   onMount(() => {
-    // setup();
+    setup().then(setGestureRecognizer);
   });
+
+  async function handleWebcamReady(video: HTMLVideoElement) {
+    if (gestureRecognizer()) {
+      let nowInMs = Date.now();
+      const results = await gestureRecognizer()!.recognizeForVideo(
+        video,
+        nowInMs
+      );
+      //console.log(results);
+      //setGesture(JSON.stringify(results.landmarks[0]?.[0], null, 2));
+    }
+
+    //setTimeout(() => {
+    //  handleWebcamReady(video);
+    //}, 100);
+    window.requestAnimationFrame(() => handleWebcamReady(video));
+  }
+
   return (
     <div class={styles.gestureRecognition}>
-      <Webcam />
+      {gesture}
+      <Webcam onReady={handleWebcamReady} />
     </div>
   );
 }
@@ -18,10 +41,10 @@ async function setup() {
   const vision = await FilesetResolver.forVisionTasks(
     "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
   );
-  const gestureRecognizer = await GestureRecognizer.createFromModelPath(
-    vision,
-    "https://storage.googleapis.com/mediapipe-tasks/gesture_recognizer/gesture_recognizer.task"
-  );
-  const image = document.getElementById("image") as HTMLImageElement;
-  const recognitions = gestureRecognizer.recognize(image);
+  return await GestureRecognizer.createFromOptions(vision, {
+    baseOptions: {
+      modelAssetPath: "/gesture_recognizer.task",
+    },
+    runningMode: "VIDEO",
+  });
 }
