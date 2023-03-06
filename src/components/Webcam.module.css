@@ -1,0 +1,15 @@
+.webcam {
+  width: 480px;
+  height: 360px;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  pointer-events: auto;
+}
+
+.enableWebcam {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+}

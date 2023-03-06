@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@liveblocks/client": "^1.0.1",
+    "@mediapipe/tasks-vision": "^0.1.0-alpha-4",
     "@solidjs/meta": "^0.28.2",
     "@solidjs/router": "^0.7.0",
     "perfect-freehand": "^1.2.0",
