@@ -27,7 +27,9 @@ export type Storage = {
 
 export type UserMeta = {};
 
-export type RoomEvent = {};
+export type RoomEvent = {
+  type: "RESET";
+};
 
 const enterRoomWithContext = client.enter<
   Presence,

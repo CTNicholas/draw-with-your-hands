@@ -18,12 +18,27 @@ export default function Home() {
 
   onMount(() => {
     async function run() {
-      const storage = await room().getStorage();
-      setStrokes(storage.root.get("strokes"));
+      const { root } = await room().getStorage();
+      setStrokes(root.get("strokes"));
+
+      const unsubscribe = room().subscribe("event", ({ event }) => {
+        if (event.type === "RESET") {
+          setStrokes(root.get("strokes"));
+        }
+      });
+
+      onCleanup(unsubscribe);
     }
 
     run();
   });
+
+  async function handleReset() {
+    const { root } = await room().getStorage();
+    root.set("strokes", new LiveMap());
+    setStrokes(root.get("strokes"));
+    room().broadcastEvent({ type: "RESET" });
+  }
 
   onCleanup(() => {
     leaveRoom(roomId);
@@ -32,12 +47,19 @@ export default function Home() {
   return (
     <Template>
       <Show
-        keyed={false}
+        keyed={true}
         when={room() && strokes()}
-        fallback={<div>loading...</div>}
+        fallback={<div style={{ color: "white" }}>loading (TODO)...</div>}
       >
         <Canvas room={room()} strokes={strokes() as Storage["strokes"]} />
       </Show>
+      <button
+        onClick={handleReset}
+        style={{ position: "absolute", right: 0, top: 0 }}
+      >
+        {" "}
+        delete (TODO)
+      </button>
     </Template>
   );
 }
