@@ -3,7 +3,27 @@ import { FilesetResolver, GestureRecognizer } from "@mediapipe/tasks-vision";
 import Webcam from "~/components/Webcam";
 import styles from "./GestureRecognition.module.css";
 
-export default function GestureRecognition() {
+export type Coords = { x: number; y: number; z: number };
+
+export type Gesture =
+  | "Open_Palm"
+  | "Closed_Fist"
+  | "Thumb_Up"
+  | "Thumb_Down"
+  | "ILoveYou"
+  | "Victory"
+  | "Pointing_Up";
+
+export type onGestureResult = {
+  coords: Coords | null;
+  gesture: Gesture | null;
+};
+
+type Props = {
+  onGesture: ({ gesture, coords }: onGestureResult) => void;
+};
+
+export default function GestureRecognition(props: Props) {
   const [gestureRecognizer, setGestureRecognizer] =
     createSignal<GestureRecognizer>();
   const [gesture, setGesture] = createSignal("NONE");
@@ -19,19 +39,22 @@ export default function GestureRecognition() {
         video,
         nowInMs
       );
-      //console.log(results);
-      //setGesture(JSON.stringify(results.landmarks[0]?.[0], null, 2));
+      const result = {
+        coords: results.landmarks[0]?.[0] || null,
+        gesture: (results.gestures[0]?.[0]?.categoryName as Gesture) || null,
+      };
+      props.onGesture(result);
+      setGesture(JSON.stringify(result));
     }
 
-    //setTimeout(() => {
-    //  handleWebcamReady(video);
-    //}, 100);
-    window.requestAnimationFrame(() => handleWebcamReady(video));
+    setTimeout(() => {
+      handleWebcamReady(video);
+    }, 50);
+    //window.requestAnimationFrame(() => handleWebcamReady(video));
   }
 
   return (
     <div class={styles.gestureRecognition}>
-      {gesture}
       <Webcam onReady={handleWebcamReady} />
     </div>
   );

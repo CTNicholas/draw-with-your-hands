@@ -1,0 +1,9 @@
+.gestureCursor {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.gestureEmoji {
+  font-size: 30px;
+}

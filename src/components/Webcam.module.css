@@ -3,6 +3,7 @@
   right: 0;
   bottom: 0;
   pointer-events: auto;
+  transform: scaleX(-1);
 }
 
 .enableWebcam {

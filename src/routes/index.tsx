@@ -3,6 +3,7 @@ import { enterRoom, leaveRoom, Room, Storage } from "~/liveblocks.config";
 import { LiveMap } from "@liveblocks/client";
 import Canvas from "~/components/Canvas";
 import Template from "~/components/Template";
+import DeleteButton from "~/components/DeleteButton";
 
 const roomId = "my-solid-room-2";
 
@@ -53,13 +54,8 @@ export default function Home() {
       >
         <Canvas room={room()} strokes={strokes() as Storage["strokes"]} />
       </Show>
-      <button
-        onClick={handleReset}
-        style={{ position: "absolute", right: 0, top: 0 }}
-      >
-        {" "}
-        delete (TODO)
-      </button>
+
+      <DeleteButton onClick={handleReset} />
     </Template>
   );
 }
